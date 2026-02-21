@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import bestseller.com.TaskMangement.dto.LoginRequest;
 import bestseller.com.TaskMangement.dto.RegisterRequest;
 import bestseller.com.TaskMangement.dto.UserResponse;
 import bestseller.com.TaskMangement.service.UserService;
@@ -60,6 +61,15 @@ public class UserController {
         String result = userService.deleteUser(id);
         if (result.equals("User not found")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+        String result = userService.loginUser(loginRequest);
+        if (result.equals("Invalid email or password")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
         }
         return ResponseEntity.ok(result);
     }

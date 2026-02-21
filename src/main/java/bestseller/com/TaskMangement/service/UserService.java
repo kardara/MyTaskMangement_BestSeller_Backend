@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import bestseller.com.TaskMangement.dto.LoginRequest;
 import bestseller.com.TaskMangement.dto.RegisterRequest;
 import bestseller.com.TaskMangement.dto.UserResponse;
 import bestseller.com.TaskMangement.model.ERole;
@@ -77,5 +78,14 @@ public class UserService {
         } else {
             return "User not found";
         }
+    }
+
+    public String loginUser(LoginRequest loginRequest) {
+        Optional<User> user = userRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
+
+        if(!user.isPresent()){
+            return "Invalid email or password";
+        }
+        return "Login successful";
     }
 }
