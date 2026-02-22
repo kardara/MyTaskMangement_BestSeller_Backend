@@ -1,8 +1,9 @@
 package bestseller.com.TaskMangement.controller;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import bestseller.com.TaskMangement.dto.LoginRequest;
 import bestseller.com.TaskMangement.dto.RegisterRequest;
 import bestseller.com.TaskMangement.dto.UserResponse;
 import bestseller.com.TaskMangement.service.UserService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
@@ -30,8 +32,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllUsers() {
-        List<UserResponse> users = userService.getAllUsers();
+    public ResponseEntity<?> getAllUsers(Pageable pageable) {
+        Page<UserResponse> users = userService.getAllUsers(pageable);
         if (users == null || users.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No users found");
         }
@@ -65,8 +67,9 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+    @PostMapping(value = "/login", consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
+        System.out.println("Login");
         String result = userService.loginUser(loginRequest);
         if (result.equals("Invalid email or password")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
