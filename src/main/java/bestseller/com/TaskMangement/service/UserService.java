@@ -7,6 +7,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
+import bestseller.com.TaskMangement.security.JwtUtil;
+import bestseller.com.TaskMangement.dto.AuthResponse;
 
 import bestseller.com.TaskMangement.dto.LoginRequest;
 import bestseller.com.TaskMangement.dto.RegisterRequest;
@@ -14,13 +18,15 @@ import bestseller.com.TaskMangement.dto.UserResponse;
 import bestseller.com.TaskMangement.model.ERole;
 import bestseller.com.TaskMangement.model.User;
 import bestseller.com.TaskMangement.repository.UserRepository;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class UserService {
-    
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     public String saveUser(RegisterRequest user) {
         boolean exists = userRepository.existsByEmail(user.getEmail());
@@ -30,12 +36,30 @@ public class UserService {
         User newUser = User.builder()
                 .name(user.getName())
                 .email(user.getEmail())
-                .password(user.getPassword())
+                .password(passwordEncoder.encode(user.getPassword()))
                 .role(ERole.USER)
                 .build();
         userRepository.save(newUser);
         return "User saved successfully";
     }
+    public User registerUser(RegisterRequest request) {
+        User newUser = User.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(ERole.USER)
+                .build();
+        return userRepository.save(newUser);
+    }
+
+        public UserResponse mapToUserResponse(User user) {
+            return new UserResponse(
+                    user.getUserId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getRole()
+            );
+        }
     
     public Page<UserResponse> getAllUsers(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);
@@ -66,7 +90,7 @@ public class UserService {
             User existingUser = user.get();
             existingUser.setName(userRequest.getName());
             existingUser.setEmail(userRequest.getEmail());
-            existingUser.setPassword(userRequest.getPassword());
+            existingUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
             userRepository.save(existingUser);
             return "User updated successfully";
         } else {
@@ -84,12 +108,17 @@ public class UserService {
         }
     }
 
-    public String loginUser(LoginRequest loginRequest) {
-        Optional<User> user = userRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
-
-        if(!user.isPresent()){
-            return "Invalid email or password";
+    public AuthResponse loginUser(LoginRequest loginRequest) {
+        Optional<User> userOpt = userRepository.findByEmail(loginRequest.getEmail());
+        if (userOpt.isEmpty()) {
+            return null;
         }
-        return "Login successful";
+        User user = userOpt.get();
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            return null;
+        }
+        String token = jwtUtil.generateToken(user.getUsername());
+        UserResponse userResponse = mapToUserResponse(user);
+        return new AuthResponse(token, userResponse);
     }
 }

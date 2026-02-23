@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import bestseller.com.TaskMangement.dto.AuthResponse;
 
 import bestseller.com.TaskMangement.dto.LoginRequest;
 import bestseller.com.TaskMangement.dto.RegisterRequest;
@@ -23,7 +24,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> saveUser(@RequestBody RegisterRequest user) {
+    public ResponseEntity<?> saveUser(@Valid @RequestBody RegisterRequest user) {
         String result = userService.saveUser(user);
         if (result.equals("User with this email already exists")) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(result);
@@ -69,11 +70,10 @@ public class UserController {
 
     @PostMapping(value = "/login", consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
-        System.out.println("Login");
-        String result = userService.loginUser(loginRequest);
-        if (result.equals("Invalid email or password")) {
+        AuthResponse authResponse = userService.loginUser(loginRequest);
+        if (authResponse == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
         }
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(authResponse);
     }
 }
