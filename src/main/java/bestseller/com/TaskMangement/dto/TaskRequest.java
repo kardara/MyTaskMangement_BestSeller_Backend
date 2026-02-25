@@ -13,6 +13,4 @@ public class TaskRequest {
     private String title;
     private String description;
     private ETaskStatus status;
-    private LocalDateTime dueDate;
-    private LocalDateTime reminderTime;
 }

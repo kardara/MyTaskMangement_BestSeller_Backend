@@ -1,7 +1,5 @@
 package bestseller.com.TaskMangement.model;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,12 +20,6 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     private ETaskStatus status;
-
-    private LocalDateTime dueDate;
-
-    private LocalDateTime reminderTime;
-
-    private Boolean reminderSent;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

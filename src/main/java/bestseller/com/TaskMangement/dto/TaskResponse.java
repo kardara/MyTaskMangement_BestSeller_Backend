@@ -14,8 +14,5 @@ public class TaskResponse {
     private String title;
     private String description;
     private ETaskStatus status;
-    private LocalDateTime dueDate;
-    private LocalDateTime reminderTime;
-    private Boolean reminderSent;
     private Long userId;
 }

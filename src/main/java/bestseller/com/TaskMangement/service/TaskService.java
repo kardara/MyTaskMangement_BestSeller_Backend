@@ -73,8 +73,6 @@ public class TaskService {
             task.setTitle(taskRequest.getTitle());
             task.setDescription(taskRequest.getDescription());
             task.setStatus(taskRequest.getStatus());
-            task.setDueDate(taskRequest.getDueDate());
-            task.setReminderTime(taskRequest.getReminderTime());
             taskRepository.save(task);
             return "Task updated successfully";
         } else if (taskOpt.isPresent()) {
@@ -90,9 +88,6 @@ public class TaskService {
                 .title(task.getTitle())
                 .description(task.getDescription())
                 .status(task.getStatus())
-                .dueDate(task.getDueDate())
-                .reminderTime(task.getReminderTime())
-                .reminderSent(task.getReminderSent())
                 .userId(task.getUser() != null ? task.getUser().getUserId() : null)
                 .build();
     }
@@ -102,8 +97,6 @@ public class TaskService {
                 .title(dto.getTitle())
                 .description(dto.getDescription())
                 .status(dto.getStatus())
-                .dueDate(dto.getDueDate())
-                .reminderTime(dto.getReminderTime())
                 .build();
     }
 }
