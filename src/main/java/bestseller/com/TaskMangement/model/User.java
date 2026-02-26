@@ -1,7 +1,11 @@
 package bestseller.com.TaskMangement.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,10 +36,14 @@ public class User implements org.springframework.security.core.userdetails.UserD
     @OneToMany(mappedBy = "user")
     @Builder.Default
     private List<Task> tasks = new ArrayList<>();
+    
+    @Builder.Default
+    @Column(name = "is_Deactivated")
+    private boolean isDeleted = false;
 
     @Override
-    public java.util.Collection<? extends org.springframework.security.core.GrantedAuthority> getAuthorities() {
-        return java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(role.name()));
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override

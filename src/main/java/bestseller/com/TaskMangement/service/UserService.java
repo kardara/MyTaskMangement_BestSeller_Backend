@@ -38,18 +38,10 @@ public class UserService {
                 .email(user.getEmail())
                 .password(passwordEncoder.encode(user.getPassword()))
                 .role(ERole.USER)
+                .isDeleted(false)
                 .build();
         userRepository.save(newUser);
         return "User saved successfully";
-    }
-    public User registerUser(RegisterRequest request) {
-        User newUser = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(ERole.USER)
-                .build();
-        return userRepository.save(newUser);
     }
 
         public UserResponse mapToUserResponse(User user) {
@@ -57,30 +49,34 @@ public class UserService {
                     user.getUserId(),
                     user.getName(),
                     user.getEmail(),
-                    user.getRole()
+                    user.getRole(),
+                    user.isDeleted()
             );
         }
     
     public Page<UserResponse> getAllUsers(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);
-        Page<UserResponse> response = users.map(user -> new UserResponse(user.getUserId(), user.getName(), user.getEmail(), user.getRole()));
+        Page<UserResponse> response = users.map(user -> new UserResponse(user.getUserId(), user.getName(), user.getEmail(), user.getRole(), user.isDeleted()));
         return response;
     }
 
     @Cacheable(value = "users", key = "#id")
     public UserResponse getUserById(Long id) {
         Optional<User> optionalUser = userRepository.findById(id);
-
-    if (optionalUser.isPresent()) {
-        User user = optionalUser.get();
-        return new UserResponse(
-                user.getUserId(),
-                user.getName(),
-                user.getEmail(),
-                user.getRole()
-        );
-    }
-    return null;
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if (user.isDeleted()) {
+                return null;
+            }
+            return new UserResponse(
+                    user.getUserId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getRole(),
+                    user.isDeleted()
+            );
+        }
+        return null;
     }
 
     @CacheEvict(value = "users", key = "#id")
@@ -100,9 +96,12 @@ public class UserService {
 
     @CacheEvict(value = "users", key = "#id")
     public String deleteUser(Long id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-            return "User deleted successfully";
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setDeleted(true);
+            userRepository.save(user);
+            return "User deactivated successfully";
         } else {
             return "User not found";
         }
@@ -114,6 +113,9 @@ public class UserService {
             return null;
         }
         User user = userOpt.get();
+        if (user.isDeleted()) {
+            return null;
+        }
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             return null;
         }

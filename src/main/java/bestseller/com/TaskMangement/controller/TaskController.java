@@ -4,7 +4,8 @@ package bestseller.com.TaskMangement.controller;
 import bestseller.com.TaskMangement.dto.TaskRequest;
 import bestseller.com.TaskMangement.dto.TaskResponse;
 import bestseller.com.TaskMangement.service.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +13,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/tasks")
+@AllArgsConstructor
 public class TaskController {
-    @Autowired
-    private TaskService taskService;
+    private final TaskService taskService;
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody TaskRequest taskRequest, Authentication authentication) {

@@ -18,6 +18,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
+@CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
     
     @Autowired
@@ -27,7 +28,7 @@ public class UserController {
     public ResponseEntity<?> saveUser(@Valid @RequestBody RegisterRequest user) {
         String result = userService.saveUser(user);
         if (result.equals("User with this email already exists")) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(result);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body( new ErrorResponse(result));
         }
         return ResponseEntity.ok(result);
     }
@@ -72,8 +73,24 @@ public class UserController {
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
         AuthResponse authResponse = userService.loginUser(loginRequest);
         if (authResponse == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse("Invalid email or password"));
         }
         return ResponseEntity.ok(authResponse);
     }
+class ErrorResponse {
+    private String error;
+
+    public ErrorResponse(String error) {
+        this.error = error;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+}
 }
