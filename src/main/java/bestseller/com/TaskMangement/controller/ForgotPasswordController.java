@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import bestseller.com.TaskMangement.dto.ChangePassword;
 import bestseller.com.TaskMangement.service.ForgotPasswordService;
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +15,6 @@ public class ForgotPasswordController {
 
     private final ForgotPasswordService forgotPasswordService;
 
-    // Step 1: Send OTP to email (email must exist in DB)
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestParam String email) {
         String result = forgotPasswordService.sendOtp(email);
@@ -26,7 +24,6 @@ public class ForgotPasswordController {
         return ResponseEntity.ok(result);
     }
 
-    // Step 2: Verify OTP
     @PostMapping("/verify-otp/{otp}")
     public ResponseEntity<?> verifyOtp(@PathVariable Integer otp, @RequestParam String email) {
         String result = forgotPasswordService.verifyOtp(otp, email);
@@ -36,11 +33,9 @@ public class ForgotPasswordController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
     }
 
-    // Step 3: Reset password after OTP verification
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam String email,
-                                           @RequestBody ChangePassword changePassword) {
-        String result = forgotPasswordService.resetPassword(email, changePassword);
+    public ResponseEntity<?> resetPassword(@RequestParam String email,@RequestParam String newPassword) {
+        String result = forgotPasswordService.resetPassword(email, newPassword);
         if (result.equals("Password reset successfully")) {
             return ResponseEntity.ok(result);
         }
