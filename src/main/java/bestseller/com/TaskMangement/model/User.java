@@ -37,9 +37,6 @@ public class User implements org.springframework.security.core.userdetails.UserD
     @Builder.Default
     private List<Task> tasks = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user")
-    private ForgotPasswordOtp forgotPasswordOtp;
-    
     @Builder.Default
     @Column(name = "is_Deactivated")
     private boolean isDeleted = false;

@@ -1,7 +1,6 @@
 package bestseller.com.TaskMangement.service;
 
-import java.sql.Date;
-import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
 
@@ -34,9 +33,9 @@ public class ForgotPasswordService {
         int otp = new Random().nextInt(100000, 999999);
         Date expirationDate = new Date(System.currentTimeMillis() + 10 * 60 * 1000);
 
-        forgotPasswordRepo.findByUser(user).ifPresent(otpRecord -> forgotPasswordRepo.delete(otpRecord));
+        forgotPasswordRepo.findByUserAndIsUsedFalse(user).ifPresent(old -> { old.setUsed(true); forgotPasswordRepo.save(old); });
 
-        ForgotPasswordOtp forgotPasswordOtp = new ForgotPasswordOtp(null, otp, expirationDate, user);
+        ForgotPasswordOtp forgotPasswordOtp = new ForgotPasswordOtp(null, otp, expirationDate, user, false);
         forgotPasswordRepo.save(forgotPasswordOtp);
 
         MailBody mailBody = new MailBody(
@@ -55,14 +54,15 @@ public class ForgotPasswordService {
         }
         User user = userOpt.get();
 
-        Optional<ForgotPasswordOtp> otpOpt = forgotPasswordRepo.findByUser(user);
+        Optional<ForgotPasswordOtp> otpOpt = forgotPasswordRepo.findByUserAndIsUsedFalse(user);
         if (otpOpt.isEmpty()) {
             return "OTP not found. Please request a new OTP";
         }
 
         ForgotPasswordOtp forgotPasswordOtp = otpOpt.get();
-        if (forgotPasswordOtp.getExpirationDate().before(Date.from(Instant.now()))) {
-            forgotPasswordRepo.delete(forgotPasswordOtp);
+        if (forgotPasswordOtp.getExpirationDate().before(new Date())) {
+            forgotPasswordOtp.setUsed(true);
+            forgotPasswordRepo.save(forgotPasswordOtp);
             return "OTP has expired. Please request a new one";
         }
         if (!forgotPasswordOtp.getOtp().equals(otp)) {
@@ -80,7 +80,7 @@ public class ForgotPasswordService {
         }
         User user = userOpt.get();
 
-        forgotPasswordRepo.findByUser(user).ifPresent(otpRecord -> forgotPasswordRepo.delete(otpRecord));
+        forgotPasswordRepo.findByUserAndIsUsedFalse(user).ifPresent(old -> { old.setUsed(true); forgotPasswordRepo.save(old); });
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
