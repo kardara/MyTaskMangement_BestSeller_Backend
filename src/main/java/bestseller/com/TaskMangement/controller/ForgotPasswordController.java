@@ -1,19 +1,19 @@
 package bestseller.com.TaskMangement.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import bestseller.com.TaskMangement.service.ForgotPasswordService;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/forgot-password")
 @CrossOrigin(origins = "http://localhost:5173")
-@RequiredArgsConstructor
 public class ForgotPasswordController {
 
-    private final ForgotPasswordService forgotPasswordService;
+    @Autowired
+    private  ForgotPasswordService forgotPasswordService;
 
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestParam String email) {
