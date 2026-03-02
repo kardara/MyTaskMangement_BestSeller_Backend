@@ -95,13 +95,28 @@ public class UserService {
     }
 
     @CacheEvict(value = "users", key = "#id")
-    public String deleteUser(Long id) {
+    public String blockUser(Long id) {
         Optional<User> userOpt = userRepository.findById(id);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
+            if (user.isDeleted()) return "User is already blocked";
             user.setDeleted(true);
             userRepository.save(user);
-            return "User deactivated successfully";
+            return "User blocked successfully";
+        } else {
+            return "User not found";
+        }
+    }
+
+    @CacheEvict(value = "users", key = "#id")
+    public String unblockUser(Long id) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (!user.isDeleted()) return "User is not blocked";
+            user.setDeleted(false);
+            userRepository.save(user);
+            return "User unblocked successfully";
         } else {
             return "User not found";
         }

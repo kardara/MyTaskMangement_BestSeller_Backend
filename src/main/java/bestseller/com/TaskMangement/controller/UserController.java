@@ -58,9 +58,18 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        String result = userService.deleteUser(id);
+    @PatchMapping(value = "/{id}/block")
+    public ResponseEntity<?> blockUser(@PathVariable Long id) {
+        String result = userService.blockUser(id);
+        if (result.equals("User not found")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(result));
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @PatchMapping(value = "/{id}/unblock")
+    public ResponseEntity<?> unblockUser(@PathVariable Long id) {
+        String result = userService.unblockUser(id);
         if (result.equals("User not found")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(result));
         }
