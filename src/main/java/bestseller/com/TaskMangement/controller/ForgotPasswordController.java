@@ -9,7 +9,6 @@ import bestseller.com.TaskMangement.service.ForgotPasswordService;
 
 @RestController
 @RequestMapping("/forgot-password")
-@CrossOrigin(origins = "http://localhost:5173")
 public class ForgotPasswordController {
 
     @Autowired

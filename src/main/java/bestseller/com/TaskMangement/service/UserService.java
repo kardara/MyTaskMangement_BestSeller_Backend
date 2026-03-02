@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import bestseller.com.TaskMangement.security.JwtUtil;
 import bestseller.com.TaskMangement.dto.AuthResponse;
-
+import bestseller.com.TaskMangement.exceptions.AccountBlockedException;
 import bestseller.com.TaskMangement.dto.LoginRequest;
 import bestseller.com.TaskMangement.dto.RegisterRequest;
 import bestseller.com.TaskMangement.dto.UserResponse;
@@ -114,7 +114,7 @@ public class UserService {
         }
         User user = userOpt.get();
         if (user.isDeleted()) {
-            return null;
+            throw new AccountBlockedException("This account has been blocked. Please contact the administrator.");
         }
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             return null;

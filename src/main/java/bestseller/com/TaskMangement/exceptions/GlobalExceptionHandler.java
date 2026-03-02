@@ -35,4 +35,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
+    @ExceptionHandler(AccountBlockedException.class)
+    public ResponseEntity<ErrorResponse> handleAccountBlockedException(AccountBlockedException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                null,
+                LocalDateTime.now().toString(),
+                HttpStatus.FORBIDDEN.value()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
 }
