@@ -33,7 +33,7 @@ public class TaskService {
                 .toList();
     }
 
-    @CacheEvict(value = "tasks", key = "#result.id")
+    @CachePut(value = "tasks", key = "#result.id")
     public TaskResponse saveTask(TaskRequest taskRequest, String email) {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) return null;
@@ -65,7 +65,7 @@ public class TaskService {
         }
     }
 
-    @CachePut(value = "tasks", key = "#id")
+    @CacheEvict(value = "tasks", key = "#id")
     public String updateTask(Long id, TaskRequest taskRequest, String email) {
         Optional<Task> taskOpt = taskRepository.findById(id);
         if (taskOpt.isPresent() && taskOpt.get().getUser().getEmail().equals(email)) {

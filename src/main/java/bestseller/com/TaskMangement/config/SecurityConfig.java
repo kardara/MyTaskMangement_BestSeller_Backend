@@ -33,10 +33,8 @@ public class SecurityConfig {
       .csrf(csrf -> csrf.disable())
       .authorizeHttpRequests(auth -> auth
         .requestMatchers("/users/login", "/users/save", "/forgot-password/**").permitAll()
-        .requestMatchers("/users/all").hasAuthority("ADMIN")
-        .requestMatchers("/users/*/block", "/users/*/unblock").hasAuthority("ADMIN")
-        .requestMatchers("/users/{id}").authenticated()
-        .requestMatchers("/tasks/**").authenticated()
+        .requestMatchers("/users/all", "/users/*/block", "/users/*/unblock").hasAuthority("ADMIN")
+        .requestMatchers("/users/{id}", "/tasks/**").authenticated()
         .anyRequest().authenticated()
       )
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

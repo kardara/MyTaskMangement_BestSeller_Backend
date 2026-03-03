@@ -4,6 +4,7 @@ package bestseller.com.TaskMangement.controller;
 import bestseller.com.TaskMangement.dto.TaskRequest;
 import bestseller.com.TaskMangement.dto.TaskResponse;
 import bestseller.com.TaskMangement.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class TaskController {
     private final TaskService taskService;
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody TaskRequest taskRequest, Authentication authentication) {
+    public ResponseEntity<?> updateTask(@PathVariable Long id, @Valid @RequestBody TaskRequest taskRequest, Authentication authentication) {
         String email = authentication.getName();
         String result = taskService.updateTask(id, taskRequest, email);
         if (result.equals("Task updated successfully")) {
@@ -37,7 +38,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest taskRequest, Authentication authentication) {
+    public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody TaskRequest taskRequest, Authentication authentication) {
         String email = authentication.getName();
         return ResponseEntity.ok(taskService.saveTask(taskRequest, email));
     }

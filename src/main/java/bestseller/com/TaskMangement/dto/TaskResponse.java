@@ -4,7 +4,6 @@ import bestseller.com.TaskMangement.model.ETaskStatus;
 import lombok.*;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
